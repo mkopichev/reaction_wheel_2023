@@ -1,6 +1,5 @@
 #include "../include/mpu.h"
 
-// float t2_counter = 0, time, time_prev;
 float time_elapsed;
 
 float accel_res[3] = {0, 0, 0};
@@ -88,21 +87,14 @@ void mpuGetAccGyroData(void) {
     gyro_res[Z_AXIS] = ((((int)mpuReadRegister(GYRO_ZOUT_H) << 8) | (int)mpuReadRegister(GYRO_ZOUT_L)) - gyro_res_error[Z_AXIS]) / 65.5;
 }
 
-// void mpuTimerInit(void) {
-
-//     TCCR2B = (1 << CS22) | (1 << CS20); // prescaler 128
-//     TCNT2 = 0x83;                       // timer interrupt
-//     TIMSK2 = (1 << TOIE2);              // every 1 ms
-// }
-
 void mpuInit(void) {
 
     mpuSendCommand(PWR_MGMT_1, 0); // internal 8MHz clock
     _delay_ms(25);
     mpuSendCommand(PWR_MGMT_2, 0);
-    mpuSendCommand(CONFIG, (1 << 2) | (1 << 0)); // filter is on
-    mpuSendCommand(GYRO_CONFIG, (1 << 3));       // +-500 deg/s sensitivity 65.5 LSB/deg/s
-    mpuSendCommand(ACCEL_CONFIG, (1 << 4));      // +-8 g sensitivity 4096 LSB/g
+    mpuSendCommand(CONFIG, (1 << 2));       // filter is on
+    mpuSendCommand(GYRO_CONFIG, (1 << 3));  // +-500 deg/s sensitivity 65.5 LSB/deg/s
+    mpuSendCommand(ACCEL_CONFIG, (1 << 4)); // +-8 g sensitivity 4096 LSB/g
     // mpuTimerInit();
     mpuErrorCalc();
     // time = t2_counter;
@@ -118,23 +110,13 @@ void mpuPrintAngle(void) {
 
 void mpuGetAngle(void) {
 
-    // time_prev = time;
-    // time = t2_counter;
-    // time_elapsed = (time - time_prev);
-
     mpuGetAccGyroData();
 
     // gyro data has 20ms period from control.c file
-    gyro_angle[Y_AXIS] = gyro_res[Y_AXIS] * TIME_CONSTANT;  // time_elapsed;
-    gyro_angle[Z_AXIS] = -gyro_res[Z_AXIS] * TIME_CONSTANT; // time_elapsed;
+    gyro_angle[Y_AXIS] = gyro_res[Y_AXIS] * TIME_CONSTANT;
+    gyro_angle[Z_AXIS] = -gyro_res[Z_AXIS] * TIME_CONSTANT;
     accel_angle[X_AXIS] = (atan2f((accel_res[Y_AXIS]), sqrt(pow((accel_res[X_AXIS]), 2) + pow((accel_res[Z_AXIS]), 2))) * RAD_TO_DEG);
     accel_angle[Y_AXIS] = (atan2f(-1 * (accel_res[X_AXIS]), sqrt(pow((accel_res[Y_AXIS]), 2) + pow((accel_res[Z_AXIS]), 2))) * RAD_TO_DEG);
 
-    inclination_angle = 0.98 * (inclination_angle + gyro_angle[Z_AXIS]) + 0.02 * accel_angle[Y_AXIS];
+    inclination_angle = ANGLE_FILTER_GYRO * (inclination_angle + gyro_angle[Z_AXIS]) + (1 - ANGLE_FILTER_GYRO) * accel_angle[Y_AXIS];
 }
-
-// ISR(TIMER2_OVF_vect) { // 1 ms period
-
-//     TCNT2 = 0x83;
-//     t2_counter++;
-// }

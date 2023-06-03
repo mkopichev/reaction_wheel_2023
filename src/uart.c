@@ -16,7 +16,6 @@ void uartInit(void) {
     UBRR0H = 0;
     // for 9600 baudrate UBRR0L = 103 = 0x67
     UBRR0L = 0x67;
-    uartTransmitStr("uart_on\r\n");
 }
 
 // transmit byte of data
@@ -101,7 +100,7 @@ void uarTransmitFloat(float val) {
 
     char buffer[20], float_[10];
     dtostrf(val, 5, 3, float_);
-    sprintf(buffer, "%s d\r\n", float_);
+    sprintf(buffer, "%s", float_);
     uartTransmitStr(buffer);
 }
 

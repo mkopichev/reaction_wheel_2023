@@ -3,13 +3,15 @@
 
 #include "utils.h"
 
-#define SETPOINT 0
+#define ANGLE_FIXRATE 0.1F
 
-#define P_COEF 70
-#define I_COEF -0.9
-#define D_COEF 0
+#define P_COEF 98.2F
+#define I_COEF 19.7F
+#define D_COEF 0.009F
 
-#define TIME_CONSTANT 0.004
+#define TIME_CONSTANT 0.005F
+
+#define ANGLE_FILTER_GYRO 0.98F
 
 void controlLoopInit(void);
 void pidControl(float angle);
