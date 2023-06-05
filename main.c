@@ -9,14 +9,15 @@ int main(void) {
     initAll();
 
     while(1) {
-        uartTransmitDec((int16_t)(inclination_angle * 100));
+
+        uartTransmitDec((int16_t)(inclination_angle * 10));
         uartTransmitByte('\t');
         uartTransmitDec((int16_t)(error * 100));
         uartTransmitByte('\t');
         uartTransmitDec((int16_t)(control * 1));
         uartTransmitByte('\r');
         uartTransmitByte('\n');
-        _delay_ms(10);
+        _delay_ms(5);
     }
 }
 

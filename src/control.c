@@ -13,7 +13,7 @@ void controlLoopInit(void) {
 
 void pidControl(float angle) {
 
-    static float error_integral = 0, error_diff = 0, error_prev = 0, setpoint_angle = 0.3;
+    static float error_integral = 0, error_diff = 0, error_prev = 0, setpoint_angle = ANGLE_SETPOINT;
 
     // variate setpoint angle
     if(angle < setpoint_angle)
@@ -21,10 +21,16 @@ void pidControl(float angle) {
     else
         setpoint_angle -= ANGLE_FIXRATE * TIME_CONSTANT;
 
-    // pid cefs calculation
+    // pid coeffs calculation
     error = setpoint_angle - angle;
     error_integral += error * TIME_CONSTANT;
     error_diff = (error - error_prev) / TIME_CONSTANT;
+
+    if(error_integral > ERROR_SUM)
+        error_integral = ERROR_SUM;
+
+    if(error_integral < -ERROR_SUM)
+        error_integral = -ERROR_SUM;
 
     error_prev = error;
 
@@ -35,9 +41,14 @@ void pidControl(float angle) {
     if(control < -255)
         control = -255;
 
-    if((angle >= 8.0) || (angle <= -8.0))
+    if((angle >= 8.0) || (angle <= -8.0)) {
+        setpoint_angle = ANGLE_SETPOINT;
+        error = 0;
+        error_integral = 0;
+        error_diff = 0;
+        error_prev = 0;
         motorStop();
-    else {
+    } else {
         if(control >= 0)
             motorRun((uint8_t)control, CCW);
         else {
