@@ -95,6 +95,7 @@ void mpuInit(void) {
     mpuSendCommand(CONFIG, (1 << 2));       // filter is on
     mpuSendCommand(GYRO_CONFIG, (1 << 3));  // +-500 deg/s sensitivity 65.5 LSB/deg/s
     mpuSendCommand(ACCEL_CONFIG, (1 << 4)); // +-8 g sensitivity 4096 LSB/g
+    _delay_ms(25);
     mpuErrorCalc();
 }
 

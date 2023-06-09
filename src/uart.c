@@ -12,10 +12,10 @@ void uartInit(void) {
     UCSR0B |= (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
 #endif
     UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);
-    // 76800 baud
+    // 19200 baud
     UBRR0H = 0;
-    // UBRR0L = 12 = 0x0C
-    UBRR0L = 0x0C;
+    // UBRR0L = 51 = 0x33
+    UBRR0L = 0x33;
 }
 
 // transmit byte of data

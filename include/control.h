@@ -3,15 +3,15 @@
 
 #include "utils.h"
 
-#define ANGLE_SETPOINT 0.5F
+#define ANGLE_SETPOINT 0.9F
 
 #define ANGLE_FIXRATE 0.1F
 
-#define ERROR_SUM 10.0F
+#define ERROR_SUM 20.0F
 
-#define P_COEF 30.0F
-#define I_COEF 0.99F
-#define D_COEF 0.01F
+#define P_COEF 15.0F
+#define I_COEF 0.4F
+#define D_COEF 0.4F
 #define A_COEF 0.025F
 
 // #define P_COEF 35.4F
