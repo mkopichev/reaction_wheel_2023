@@ -95,9 +95,7 @@ void mpuInit(void) {
     mpuSendCommand(CONFIG, (1 << 2));       // filter is on
     mpuSendCommand(GYRO_CONFIG, (1 << 3));  // +-500 deg/s sensitivity 65.5 LSB/deg/s
     mpuSendCommand(ACCEL_CONFIG, (1 << 4)); // +-8 g sensitivity 4096 LSB/g
-    // mpuTimerInit();
     mpuErrorCalc();
-    // time = t2_counter;
 }
 
 void mpuPrintAngle(void) {
@@ -112,11 +110,19 @@ void mpuGetAngle(void) {
 
     mpuGetAccGyroData();
 
-    // gyro data has 20ms period from control.c file
+    // gyro data has period from control.c file
     gyro_angle[Y_AXIS] = gyro_res[Y_AXIS] * TIME_CONSTANT;
     gyro_angle[Z_AXIS] = -gyro_res[Z_AXIS] * TIME_CONSTANT;
     accel_angle[X_AXIS] = (atan2f((accel_res[Y_AXIS]), sqrt(pow((accel_res[X_AXIS]), 2) + pow((accel_res[Z_AXIS]), 2))) * RAD_TO_DEG);
     accel_angle[Y_AXIS] = (atan2f(-1 * (accel_res[X_AXIS]), sqrt(pow((accel_res[Y_AXIS]), 2) + pow((accel_res[Z_AXIS]), 2))) * RAD_TO_DEG);
 
-    inclination_angle = ANGLE_FILTER_GYRO * (inclination_angle + gyro_angle[Z_AXIS]) + (1 - ANGLE_FILTER_GYRO) * accel_angle[Y_AXIS];
+    static float gyro_z = 0;
+    gyro_z += gyro_angle[Z_AXIS];
+
+    inclination_angle = ANGLE_FILTER_GYRO * (inclination_angle + gyro_angle[Z_AXIS]) + (1.0F - ANGLE_FILTER_GYRO) * accel_angle[Y_AXIS];
+
+    // uartTransmitByte(42);
+    // uartTransmitMultipleData(&accel_angle[Y_AXIS], sizeof(float));
+    // uartTransmitMultipleData(&gyro_z, sizeof(float));
+    // uartTransmitMultipleData(&inclination_angle, sizeof(float));
 }

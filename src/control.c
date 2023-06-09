@@ -34,15 +34,21 @@ void pidControl(float angle) {
 
     error_prev = error;
 
-    control = (P_COEF * error) + (I_COEF * error_integral) + (D_COEF * error_diff);
+    float diff_diff = A_COEF * error * error_diff;
+    if(diff_diff > ERROR_SUM)
+        diff_diff = ERROR_SUM;
+
+    if(diff_diff < -ERROR_SUM)
+        diff_diff = -ERROR_SUM;
+
+    control = (P_COEF * error * abs(error)) + (I_COEF * error_integral) + (D_COEF * error_diff) - diff_diff;
 
     if(control > 255)
         control = 255;
     if(control < -255)
         control = -255;
 
-    if((angle >= 8.0) || (angle <= -8.0)) {
-        setpoint_angle = ANGLE_SETPOINT;
+    if((angle >= 10.0) || (angle <= -10.0)) {
         error = 0;
         error_integral = 0;
         error_diff = 0;
@@ -52,8 +58,7 @@ void pidControl(float angle) {
         if(control >= 0)
             motorRun((uint8_t)control, CCW);
         else {
-            control = -control;
-            motorRun((uint8_t)control, CW);
+            motorRun((uint8_t)-control, CW);
         }
     }
 }
@@ -61,6 +66,7 @@ void pidControl(float angle) {
 ISR(TIMER1_OVF_vect) { // period = 5 ms frq = 200 Hz
 
     TCNT1 = 0xD8F0;
+
     static uint8_t t1_counter = 0;
     t1_counter++;
 

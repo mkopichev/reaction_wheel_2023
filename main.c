@@ -10,14 +10,10 @@ int main(void) {
 
     while(1) {
 
-        uartTransmitDec((int16_t)(inclination_angle * 10));
-        uartTransmitByte('\t');
-        uartTransmitDec((int16_t)(error * 100));
-        uartTransmitByte('\t');
-        uartTransmitDec((int16_t)(control * 1));
-        uartTransmitByte('\r');
-        uartTransmitByte('\n');
-        _delay_ms(5);
+        uartTransmitByte(42);
+        uartTransmitMultipleData(&control, 4);
+        uartTransmitMultipleData(&inclination_angle, 4);
+        _delay_ms(20);
     }
 }
 

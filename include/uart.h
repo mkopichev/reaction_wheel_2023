@@ -11,6 +11,9 @@ void uartTransmitByte(uint8_t byte);
 // recieve byte of data
 uint8_t uartReceiveByte(void);
 
+// transmit any data byte by byte
+void uartTransmitMultipleData(void *buf, uint8_t length);
+
 // transmit string, phrase or word
 void uartTransmitStr(char *string);
 

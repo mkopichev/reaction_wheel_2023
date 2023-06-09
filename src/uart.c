@@ -12,10 +12,10 @@ void uartInit(void) {
     UCSR0B |= (1 << RXCIE0) | (1 << RXEN0) | (1 << TXEN0);
 #endif
     UCSR0C |= (1 << UCSZ01) | (1 << UCSZ00);
-    // 9600 baud
+    // 76800 baud
     UBRR0H = 0;
-    // for 9600 baudrate UBRR0L = 103 = 0x67
-    UBRR0L = 0x67;
+    // UBRR0L = 12 = 0x0C
+    UBRR0L = 0x0C;
 }
 
 // transmit byte of data
@@ -25,6 +25,12 @@ void uartTransmitByte(uint8_t byte) {
     while(!(UCSR0A & (1 << UDRE0)))
         continue;
     UDR0 = byte;
+}
+
+void uartTransmitMultipleData(void *buf, uint8_t length) {
+    for(uint8_t i = 0; i < length; i++) {
+        uartTransmitByte(*((uint8_t *)buf + i));
+    }
 }
 
 // recieve byte of data
