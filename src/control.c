@@ -1,8 +1,14 @@
 #include "../include/control.h"
 
 extern float inclination_angle;
+extern int16_t encoder_full_revolution;
+extern int16_t encoder_pulse_counter;
 float control = 0;
 float error = 0;
+int16_t encoder_motor_speed = 0;
+
+int16_t prev_pos = 0;
+int16_t current_pos = 0;
 
 void controlLoopInit(void) {
 
@@ -21,34 +27,30 @@ void pidControl(float angle) {
     else
         setpoint_angle -= ANGLE_FIXRATE * TIME_CONSTANT;
 
+    // reduce continuous rotation
+    setpoint_angle -= ANGLE_FIXRATE_2 * encoder_motor_speed * TIME_CONSTANT;
+
     // pid coeffs calculation
     error = setpoint_angle - angle;
     error_integral += error * TIME_CONSTANT;
     error_diff = (error - error_prev) / TIME_CONSTANT;
 
-    if(error_integral > ERROR_SUM)
-        error_integral = ERROR_SUM;
+    // if(error_integral > ERROR_SUM)
+    //     error_integral = ERROR_SUM;
 
-    if(error_integral < -ERROR_SUM)
-        error_integral = -ERROR_SUM;
+    // if(error_integral < -ERROR_SUM)
+    //     error_integral = -ERROR_SUM;
 
     error_prev = error;
 
-    float diff_diff = A_COEF * error * error_diff;
-    if(diff_diff > ERROR_SUM)
-        diff_diff = ERROR_SUM;
-
-    if(diff_diff < -ERROR_SUM)
-        diff_diff = -ERROR_SUM;
-
-    control = (P_COEF * error * abs(error)) + (I_COEF * error_integral) + (D_COEF * error_diff) - diff_diff;
+    control = (-MOTOR_R * ((P_COEF * error) + (I_COEF * error_integral) + (D_COEF * error_diff))) + (P_SPEED_COEF * encoder_motor_speed);
 
     if(control > 255)
         control = 255;
     if(control < -255)
         control = -255;
 
-    if((angle >= 10.0) || (angle <= -10.0)) {
+    if((angle >= ANGLE_END_LIMIT) || (angle <= -ANGLE_END_LIMIT)) {
         error = 0;
         error_integral = 0;
         error_diff = 0;
@@ -72,6 +74,10 @@ ISR(TIMER1_OVF_vect) { // period = 5 ms frq = 200 Hz
 
     if(t1_counter == 0)
         PORTB ^= (1 << 5);
+
+    current_pos = (encoder_full_revolution * ENCODER_PPR) + encoder_pulse_counter;
+    encoder_motor_speed = current_pos - prev_pos;
+    prev_pos = current_pos;
 
     mpuGetAngle();
     pidControl(inclination_angle);
