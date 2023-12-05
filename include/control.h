@@ -9,14 +9,15 @@
 
 #define ERROR_SUM 20.0F
 
-#define P_COEF 15.0F
-#define I_COEF 0.4F
-#define D_COEF 0.4F
-#define A_COEF 0.025F
+// #define P_COEF 15.0F
+// #define I_COEF 0.4F
+// #define D_COEF 0.4F
+// #define A_COEF 0.025F
 
-// #define P_COEF 35.4F
-// #define I_COEF 89.3F
-// #define D_COEF 0.0019F
+#define P_COEF 35.4F
+#define I_COEF 89.3F
+#define D_COEF 0.0019F
+#define A_COEF 0.025F
 
 #define TIME_CONSTANT 0.005F
 
