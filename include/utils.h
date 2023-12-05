@@ -8,6 +8,7 @@
 #include "mpu.h"
 #include "twi.h"
 #include "uart.h"
+#include "mot_encoder.h"
 #include <avr/interrupt.h>
 #include <math.h>
 #include <stdbool.h>
