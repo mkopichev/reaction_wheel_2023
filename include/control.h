@@ -20,6 +20,7 @@
 #define I_COEF 89.3F
 #define D_COEF 0.0019F
 #define A_COEF 0.025F
+#define P_SPEED_COEF 0.5F
 
 #define TIME_CONSTANT 0.005F
 

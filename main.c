@@ -1,7 +1,7 @@
 #include "include/utils.h"
 
-extern float inclination_angle, control, error;
-extern int16_t encoder_motor_speed;
+extern float inclinationAngle, control, error;
+extern int16_t encoderMotorSpeed;
 
 void initAll(void);
 
@@ -13,12 +13,12 @@ int main(void) {
 
         // uartTransmitByte(42);
         // uartTransmitMultipleData(&control, 4);
-        // uartTransmitMultipleData(&inclination_angle, 4);
+        // uartTransmitMultipleData(&inclinationAngle, 4);
         uartTransmitDec((int16_t)control);
         uartTransmitStr("\t");
-        uartTransmitDec((int16_t)inclination_angle);
+        uartTransmitDec((int16_t)inclinationAngle);
         uartTransmitStr("\t");
-        uartTransmitDec(encoder_motor_speed);
+        uartTransmitDec(encoderMotorSpeed);
         uartTransmitStr("\r\n");
         _delay_ms(20);
     }

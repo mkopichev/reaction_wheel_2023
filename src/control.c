@@ -1,14 +1,14 @@
 #include "../include/control.h"
 
-extern float inclination_angle;
-extern int16_t encoder_full_revolution;
-extern int16_t encoder_pulse_counter;
+extern float inclinationAngle;
+extern int16_t encoderFullRevolutions;
+extern int16_t encoderPulseCounter;
 float control = 0;
 float error = 0;
-int16_t encoder_motor_speed = 0;
+int16_t encoderMotorSpeed = 0;
 
-int16_t prev_pos = 0;
-int16_t current_pos = 0;
+int16_t prevPos = 0;
+int16_t currentPos = 0;
 
 void controlLoopInit(void) {
 
@@ -19,31 +19,31 @@ void controlLoopInit(void) {
 
 void pidControl(float angle) {
 
-    static float error_integral = 0, error_diff = 0, error_prev = 0, setpoint_angle = ANGLE_SETPOINT;
+    static float errorIntegral = 0, errorDiff = 0, errorPrev = 0, setpointAngle = ANGLE_SETPOINT;
 
     // variate setpoint angle
-    if(angle < setpoint_angle)
-        setpoint_angle += ANGLE_FIXRATE * TIME_CONSTANT;
+    if(angle < setpointAngle)
+        setpointAngle += ANGLE_FIXRATE * TIME_CONSTANT;
     else
-        setpoint_angle -= ANGLE_FIXRATE * TIME_CONSTANT;
+        setpointAngle -= ANGLE_FIXRATE * TIME_CONSTANT;
 
     // reduce continuous rotation
-    setpoint_angle -= ANGLE_FIXRATE_2 * encoder_motor_speed * TIME_CONSTANT;
+    setpointAngle -= ANGLE_FIXRATE_2 * encoderMotorSpeed * TIME_CONSTANT;
 
     // pid coeffs calculation
-    error = setpoint_angle - angle;
-    error_integral += error * TIME_CONSTANT;
-    error_diff = (error - error_prev) / TIME_CONSTANT;
+    error = setpointAngle - angle;
+    errorIntegral += error * TIME_CONSTANT;
+    errorDiff = (error - errorPrev) / TIME_CONSTANT;
 
-    // if(error_integral > ERROR_SUM)
-    //     error_integral = ERROR_SUM;
+    // if(errorIntegral > ERROR_SUM)
+    //     errorIntegral = ERROR_SUM;
 
-    // if(error_integral < -ERROR_SUM)
-    //     error_integral = -ERROR_SUM;
+    // if(errorIntegral < -ERROR_SUM)
+    //     errorIntegral = -ERROR_SUM;
 
-    error_prev = error;
+    errorPrev = error;
 
-    control = (-MOTOR_R * ((P_COEF * error) + (I_COEF * error_integral) + (D_COEF * error_diff))) + (P_SPEED_COEF * encoder_motor_speed);
+    control = (-MOTOR_R * ((P_COEF * error) + (I_COEF * errorIntegral) + (D_COEF * errorDiff))) + (P_SPEED_COEF * encoderMotorSpeed);
 
     if(control > 255)
         control = 255;
@@ -52,9 +52,9 @@ void pidControl(float angle) {
 
     if((angle >= ANGLE_END_LIMIT) || (angle <= -ANGLE_END_LIMIT)) {
         error = 0;
-        error_integral = 0;
-        error_diff = 0;
-        error_prev = 0;
+        errorIntegral = 0;
+        errorDiff = 0;
+        errorPrev = 0;
         motorStop();
     } else {
         if(control >= 0)
@@ -75,10 +75,10 @@ ISR(TIMER1_OVF_vect) { // period = 5 ms frq = 200 Hz
     if(t1_counter == 0)
         PORTB ^= (1 << 5);
 
-    current_pos = (encoder_full_revolution * ENCODER_PPR) + encoder_pulse_counter;
-    encoder_motor_speed = current_pos - prev_pos;
-    prev_pos = current_pos;
+    currentPos = (encoderFullRevolutions * ENCODER_PPR) + encoderPulseCounter;
+    encoderMotorSpeed = currentPos - prevPos;
+    prevPos = currentPos;
 
     mpuGetAngle();
-    pidControl(inclination_angle);
+    pidControl(inclinationAngle);
 }

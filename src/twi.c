@@ -1,6 +1,6 @@
 #include "../include/twi.h"
 
-uint8_t twi_mutex = VACANT;
+uint8_t twiMutex = VACANT;
 
 void twiInit(void) {
 
@@ -57,8 +57,8 @@ void twiReadData(uint8_t *rx_buf, uint8_t length) {
 void twiAcquire(void) {
 
     while(1) {
-        if(twi_mutex == VACANT) {
-            twi_mutex = OCCUPIED;
+        if(twiMutex == VACANT) {
+            twiMutex = OCCUPIED;
             break;
         }
     }
@@ -66,5 +66,5 @@ void twiAcquire(void) {
 
 void twiRelease(void) {
     
-    twi_mutex = VACANT;
+    twiMutex = VACANT;
 }
